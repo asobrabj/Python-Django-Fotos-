@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+    <body class="bg-light">
+
+        <div class="container py-4">
+            <h2>{{ album.title }}</h2>
+            <p class="text-muted">por {{ album.user.username }}</p>
+            <div class="row">
+                {% for photo in album.photos.all %}
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                    {% if photo.image %}
+                        <img src="{{ photo.image.url }}" class="card-img-top card-img-top zoomable" alt="{{ photo.caption }}">
+                    {% else %}
+                        <div class="text-center p-4 text-muted">Sem imagem disponível</div>
+                    {% endif %}
+                    <div class="card-body">
+                        <p class="card-text">{{ photo.caption }}</p>
+                    </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <div class="d-flex justify-content-between">
+                <a href="{% url 'profile' request.user.username %}" class="btn btn-secondary">← Voltar</a>
+                {% if request.user == album.user %}
+                    <a href="{% url 'edit_album' album.id %}" class="btn btn-primary">Editar</a>
+                {% endif %}
+            </div>
+
+        </div>
+
+    </body>
+{% endblock %}
+
+

@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Criar Novo Álbum</h2>
+
+    <form method="POST" enctype="multipart/form-data" id="albumForm">
+        {% csrf_token %}
+        {{ album_form.as_p }}
+
+        <h5>Fotos:</h5>
+        {{ formset.management_form }}
+        <div id="formsetContainer">
+            {% for form in formset %}
+                <div class="mb-3 border p-2 rounded formset-item">
+                    {{ form.as_p }}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="button" class="btn btn-outline-primary mb-3" onclick="addForm()">+ Adicionar mais fotos</button>
+
+        <button type="submit" class="btn btn-success mb-3">Salvar Álbum</button>
+
+        <a href="{% url 'profile' request.user.username %}" class="btn btn-secondary mb-3">← Voltar</a>
+    </form>
+</div>
+
+<script>
+    let totalForms = parseInt(document.getElementById('id_form-TOTAL_FORMS').value);
+
+    function addForm() {
+        const formContainer = document.getElementById('formsetContainer');
+        const emptyForm = document.querySelector('.formset-item').cloneNode(true);
+
+        // Limpar os campos do novo form
+        emptyForm.querySelectorAll('input').forEach(input => {
+            input.value = '';
+        });
+
+        // Ajustar o índice dos novos campos
+        emptyForm.innerHTML = emptyForm.innerHTML.replace(/form-(\d)-/g, `form-${totalForms}-`);
+
+        formContainer.appendChild(emptyForm);
+
+        totalForms++;
+        document.getElementById('id_form-TOTAL_FORMS').value = totalForms;
+    }
+</script>
+{% endblock %}

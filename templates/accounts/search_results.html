@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-6">
+
+  <!-- Campo de busca -->
+  <form method="get" action="{% url 'search_profiles' %}" class="mb-4">
+    <div class="input-group">
+      <input type="text" name="q" class="form-control" placeholder="Buscar perfis..." value="{{ query }}">
+      <button class="btn btn-primary" type="submit">Buscar</button>
+    </div>
+  </form>
+
+  <!-- Título -->
+  <h2 class="text-2xl font-semibold mb-6">Resultados da busca para: <span class="text-blue-600">"{{ query }}"</span></h2>
+
+  <!-- Resultados -->
+  {% if users %}
+    <div class="container">
+      <div class="row">
+        {% for user in users %}
+          <div class="col-12 col-sm-6 col-md-4 mb-4">
+            {% if user.username %}
+              <a href="{% url 'profile' user.username %}" 
+                class="d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4 text-decoration-none text-dark h-100"
+                style="aspect-ratio: 1 / 1; max-height: 320px;">
+            {% else %}
+              <div class="d-flex flex-column align-items-center text-center bg-white rounded shadow-sm p-4 opacity-50 cursor-not-allowed h-100"
+                  style="aspect-ratio: 1 / 1; max-height: 320px;">
+            {% endif %}
+              
+              <div class="mb-3">
+                {% if user.profile_picture %}
+                  <img src="{{ user.profile_picture.url }}" alt="{{ user.username }}" class="rounded-circle" style="width: 96px; height: 96px; object-fit: cover;">
+                {% else %}
+                  <div class="bg-secondary rounded-circle d-flex justify-content-center align-items-center text-white" style="width: 96px; height: 96px; font-size: 2rem;">👤</div>
+                {% endif %}
+              </div>
+
+              <h5 class="mb-1 text-truncate w-100">{{ user.username|default:"(Usuário sem nome)" }}</h5>
+              {% if user.bio %}
+                <p class="text-muted small text-truncate-3-lines">{{ user.bio }}</p>
+              {% else %}
+                <p class="text-muted fst-italic small">Sem bio</p>
+              {% endif %}
+
+            {% if user.username %}
+              </a>
+            {% else %}
+              </div>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+  {% else %}
+    <p class="text-gray-600 text-center mt-8">Nenhum usuário encontrado para essa busca.</p>
+  {% endif %}
+</div>
+{% endblock %}

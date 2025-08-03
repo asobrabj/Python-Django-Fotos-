@@ -1,0 +1,7 @@
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+  {{ album_form.as_p }}
+  <label for="id_image">Fotos (várias):</label>
+  <input type="file" name="image" multiple>
+  <button type="submit">Enviar Álbum</button>
+</form>

@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container mt-4">
+    <h2>Editar Álbum: {{ album.title }}</h2>
+    <form method="POST" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ album_form.as_p }}
+
+        <h5>Fotos:</h5>
+        {{ formset.management_form }}
+
+        <div id="forms-container">
+            {% for form in formset %}
+                <div class="mb-3 border p-2 rounded">
+                    {% if form.instance.pk and form.instance.image %}
+                        <img src="{{ form.instance.image.url }}" alt="" style="max-height: 150px; display: block; margin-bottom: 10px;">
+                    {% endif %}
+                    
+                    {{ form.as_p }}
+
+                    {% if form.instance.pk %}
+                        <label class="form-check-label">
+                            {{ form.DELETE.as_widget }} Deletar esse POST
+                        </label>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <div id="empty-form" style="display:none;">
+            <div class="mb-3 border p-2 rounded">
+                {{ formset.empty_form.as_p|safe }}
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-outline-primary mb-3" onclick="addForm()">+ Adicionar mais fotos</button>
+        <button type="submit" class="btn btn-success mb-3">Salvar alterações</button>  
+        <a href="{% url 'profile' request.user.username %}" class="btn btn-secondary mb-3">← Voltar</a>              
+    </form>
+</div>
+
+<script>
+  function addForm() {
+    const formsetDiv = document.querySelector('form'); // o container do form
+    const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+    const currentFormCount = parseInt(totalForms.value);
+    const emptyFormTemplate = document.getElementById('empty-form').innerHTML;
+
+    // Substitui o __prefix__ pelo índice do novo form
+    const newFormHtml = emptyFormTemplate.replace(/__prefix__/g, currentFormCount);
+
+    // Insere o novo formulário antes dos botões
+    // Você pode ter um div específico para os formulários
+    const formsContainer = document.getElementById('forms-container');
+    if (formsContainer) {
+      formsContainer.insertAdjacentHTML('beforeend', newFormHtml);
+    } else {
+      // Se não existir um container, insere no final do form, antes dos botões
+      formsetDiv.insertAdjacentHTML('beforeend', newFormHtml);
+    }
+
+    // Atualiza o total de formulários
+    totalForms.value = currentFormCount + 1;
+  }
+</script>
+{% endblock %}

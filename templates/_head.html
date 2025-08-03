@@ -1,0 +1,41 @@
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Geomassa{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap CDN (ou use o static se preferir) -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <style>
+        .zoomable {
+        transition: transform 0.3s ease;
+        cursor: zoom-in;
+        }
+
+        .zoomed {
+        transform: scale(1.5);
+        z-index: 1000;
+        position: relative;
+        cursor: zoom-out;
+        }
+    </style>
+
+</head>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Seleciona todas as imagens com a classe .zoomable
+    document.querySelectorAll('.zoomable').forEach(function(img) {
+        img.addEventListener('click', function() {
+            // Antes de aplicar o zoom, remove a classe 'zoomed' de todas as imagens
+            document.querySelectorAll('.zoomable').forEach(function(otherImg) {
+                if (otherImg !== img) {
+                    otherImg.classList.remove('zoomed');
+                }
+            });
+
+            // Faz o toggle na imagem clicada (ativa ou desativa o zoom)
+            img.classList.toggle('zoomed');
+        });
+    });
+});
+</script>

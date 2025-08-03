@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+{% block content %}
+
+
+<div class="container mt-4">
+    <h2>{{ user.username }}</h2>
+
+    <p>Bem-vindo, {{ request.user.username }}!</p>  
+
+    {% if request.user != user %}
+        <form id="follow-form" method="POST" data-username="{{ user.username }}">
+            {% csrf_token %}
+            {% if is_following %}
+                <button type="submit" id="follow-btn" class="btn btn-danger">Deixar de Seguir ❤️</button>
+            {% else %}
+                <button type="submit" id="follow-btn" class="btn btn-outline-danger">Seguir ❤️</button>
+            {% endif %}
+        </form>
+
+        <p>Seguidores: <span id="followers-count">{{ followers_count }}</span></p>
+    {% endif %}
+
+    {% if request.user == user %}
+        <a class="btn btn-primary mb-3" href="{% url 'create_album' %}">Criar Novo Álbum</a>
+    {% endif %}
+
+    <!-- Seu código de albums e paginação continua igual -->
+
+     <div class="container mt-4">
+    <div class="row g-4">
+        {% for album in albums %}
+            <div class="col-12 col-sm-6 col-md-4">
+                <a href="{% url 'album_detail' album.id %}" class="text-decoration-none text-dark">
+                    {% with photo=album.photos.first %}
+                        {% if photo %}
+                            <div class="ratio ratio-1x1 mb-2 rounded shadow overflow-hidden">
+                                <img src="{{ photo.image.url }}" alt="{{ photo.caption }}" class="img-fluid object-fit-cover w-100 h-100">
+                            </div>
+                        {% else %}
+                            <div class="ratio ratio-1x1 mb-2 rounded shadow bg-light d-flex align-items-center justify-content-center text-muted">
+                                <span>Sem fotos nesse álbum ainda.</span>
+                            </div>
+                        {% endif %}
+                    {% endwith %}
+                    <h5 class="text-center fw-semibold">{{ album.title }}</h5>
+                </a>
+            </div>
+        {% empty %}
+            <p class="text-muted">Você ainda não criou nenhum álbum.</p>
+        {% endfor %}
+    </div>
+</div>
+
+
+</div>
+
+<!-- Coloque o JS dentro de uma tag <script> -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('follow-form');
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            const username = form.getAttribute('data-username');
+            const csrfToken = form.querySelector('[name=csrfmiddlewaretoken]').value;
+
+            fetch(`/accounts/follow_toggle/${username}/`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                const btn = document.getElementById('follow-btn');
+                const countElem = document.getElementById('followers-count');
+
+                if (data.is_following) {
+                    btn.textContent = 'Deixar de Seguir ❤️';
+                    btn.className = 'btn btn-danger';
+                } else {
+                    btn.textContent = 'Seguir ❤️';
+                    btn.className = 'btn btn-outline-danger';
+                }
+
+                countElem.textContent = data.followers_count;
+            })
+            .catch(error => console.error('Erro:', error));
+        });
+    }
+});
+</script>
+
+{% endblock %}

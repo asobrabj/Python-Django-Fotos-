@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+<h2>Álbuns</h2>
+<ul>
+  {% for album in albums %}
+    <li>{{ album.title }} ({{ album.photos.count }} fotos)</li>
+  {% empty %}
+    <li>Este usuário não tem álbuns.</li>
+  {% endfor %}
+</ul>
+
+<div class="pagination">
+  {% if albums.has_previous %}
+    <a href="?page={{ albums.previous_page_number }}">← Anterior</a>
+  {% endif %}
+
+  <span>Página {{ albums.number }} de {{ albums.paginator.num_pages }}</span>
+
+  {% if albums.has_next %}
+    <a href="?page={{ albums.next_page_number }}">Próxima →</a>
+  {% endif %}
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const followForm = document.getElementById('follow-form');
+    if (followForm) {
+        followForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            const formData = new FormData(followForm);
+            fetch(followForm.action, {
+                method: 'POST',
+                headers: {
+                    'X-CSRFToken': formData.get('csrfmiddlewaretoken'),
+                },
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                const button = followForm.querySelector('button');
+                if (data.following) {
+                    button.textContent = 'Deixar de seguir';
+                } else {
+                    button.textContent = 'Seguir';
+                }
+            })
+            .catch(error => console.error('Erro ao seguir:', error));
+        });
+    }
+});
+</script>
